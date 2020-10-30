@@ -1,10 +1,11 @@
 package shell
 
 import (
+	"crypto/md5"
+	"fmt"
 	"log"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/rs/xid"
 )
 
 func dataSourceShellScript() *schema.Resource {
@@ -72,7 +73,7 @@ func dataSourceShellScriptRead(d *schema.ResourceData, meta interface{}) error {
 	interpreter := getInterpreter(client, d)
 	workingDirectory := d.Get("working_directory").(string)
 	enableParallelism := client.config.EnableParallelism
-	previousOutput := expandOutput(d.Get("output"))
+	previousOutput := make(map[string]string)
 
 	commandConfig := &CommandConfig{
 		Command:              command,
@@ -90,14 +91,18 @@ func dataSourceShellScriptRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if output == nil {
-		log.Printf("[DEBUG] Output from read operation was nil. Marking resource for deletion.")
+		log.Printf("[DEBUG] Output from read operation was nil. " +
+			"Marking resource for deletion.")
 		d.SetId("")
 		return nil
 	}
 	d.Set("output", output)
 
-	//create random uuid for the id
-	id := xid.New().String()
+	h := md5.New()
+	h.Write([]byte(command))
+
+	id := fmt.Sprintf("%x", h.Sum(nil))
 	d.SetId(id)
+
 	return nil
 }

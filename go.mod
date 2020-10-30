@@ -4,6 +4,7 @@ go 1.12
 
 require (
 	github.com/fatih/color v1.9.0 // indirect
+	github.com/google/logger v1.1.0
 	github.com/hashicorp/go-hclog v0.12.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/hashicorp/terraform-plugin-sdk v1.7.0

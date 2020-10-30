@@ -10,6 +10,8 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/google/logger"
+
 	"github.com/tidwall/gjson"
 )
 
@@ -38,7 +40,12 @@ func runCommand(c *CommandConfig) (map[string]string, error) {
 	flags := append(c.Interpreter[1:], c.Command)
 	cmd := exec.Command(shell, flags...)
 	if c.Action != ActionCreate {
-		input, _ := json.Marshal(c.PreviousOutput)
+		logger.Info("Marshalling")
+
+		input, err := json.Marshal(c.PreviousOutput)
+		if err != nil {
+			return nil, fmt.Errorf("Failed to marshal json: %s", err)
+		}
 		stdin := bytes.NewReader(input)
 		cmd.Stdin = stdin
 	}
