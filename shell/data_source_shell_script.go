@@ -72,9 +72,7 @@ func dataSourceShellScriptRead(d *schema.ResourceData, meta interface{}) error {
 	interpreter := getInterpreter(client, d)
 	workingDirectory := d.Get("working_directory").(string)
 	enableParallelism := client.config.EnableParallelism
-
-	//we don't care about previous output for data sources
-	previousOutput := make(map[string]string)
+	previousOutput := expandOutput(d.Get("output"))
 
 	commandConfig := &CommandConfig{
 		Command:              command,
